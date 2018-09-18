@@ -1,5 +1,5 @@
 ---
-- name: Create public ip
+- name: Create public ip for Linux Web Servers
   local_action:
     module: azure_rm_publicipaddress
     resource_group: "{{ az_resourcegroup_name }}"
@@ -7,7 +7,7 @@
     name: "{{ az_public_ip_name }}"
   register: r_azure_public_ip
 
-- name: Create NIC for Web servers
+- name: Create NIC for Linux Web servers
   local_action:
     module: azure_rm_networkinterface
     resource_group: "{{ az_resourcegroup_name }}"
