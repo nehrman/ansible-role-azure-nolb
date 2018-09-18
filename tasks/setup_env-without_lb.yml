@@ -1,0 +1,77 @@
+---
+- name:  Create {{ az_resourcegroup_name }} Resource Group on {{ az_region }}
+  azure_rm_resourcegroup:
+    location: "{{ az_location }}"
+    name: "{{ az_resourcegroup_name }}"
+    state: present
+    tags:
+      purpose: "{{ az_environment }}"
+
+- name:  Create {{ az_virtualnet_name }} Virtual Network on {{ az_region }}
+  azure_rm_virtualnetwork:
+    location: "{{ az_location }}"
+    resource_group: "{{ az_resourcegroup_name }}"
+    name: "{{ az_virtualnet_name }}"
+    address_prefixes_cidr: "{{ az_vn_cidr_prefix }}"
+    state: present
+    tags:
+      purpose: "{{ az_environment }}"
+
+- name:  Create {{ az_subnet_name }} Subnet on {{ az_region }}
+  azure_rm_subnet:
+    name: "{{ az_subnet_name }}"
+    resource_group: "{{ az_resourcegroup_name }}"
+    virtual_network_name: "{{ az_virtualnet_name }}"
+    address_prefix_cidr: "{{ az_sub_cidr_prefix }}"
+    state: present
+    tags:
+      purpose: "{{ az_environment }}"
+
+- name: Create "{{ az_storageaccount_name }}" Storage Account for "{{ az_resourcegroup_name }}"
+  azure_rm_storageaccount:
+    name: "{{ az_storageaccount_name }}"
+    resource_group: "{{ az_resourcegroup_name }}"
+    location: "{{ az_location }}"
+    type: "{{ az_storageaccount_type }}"
+    kind: "{{ az_storageaccount_kind }}"
+    state: present
+    tags:
+      purpose: "{{ az_environment }}"
+  when: az_blob_storage == True
+
+- name: Create {{ az_availabilitysets_name }}
+  azure_rm_availabilityset:
+    resource_group: "{{ az_resourcegroup_name }}"
+    name: "{{ az_availabilitysets_name }}"
+    location: "{{ az_location }}"
+    sku: "{{ az_availabilitysets_sku }}"
+
+- name:  Create {{ az_secgroup_name }} Security Group on {{ az_region }}
+  azure_rm_securitygroup:
+    resource_group: "{{ az_resourcegroup_name }}"
+    name: "{{ az_secgroup_name }}"
+    rules:
+      - name: SSH
+        protocol: Tcp
+        destination_port_range: 22
+        access: Allow
+        priority: 100
+        direction: Inbound
+      - name: WinRM
+        protocol: Tcp
+        destination_port_range: 5986
+        access: Allow
+        priority: 101
+        direction: Inbound
+      - name: Tomcat
+        protocol: Tcp
+        destination_port_range: 8080
+        access: Allow
+        priority: 102
+        direction: Inbound
+      - name: Http
+        protocol: Tcp
+        destination_port_range: 80
+        access: Allow
+        priority: 103
+        direction: Inbound
