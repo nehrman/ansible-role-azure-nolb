@@ -63,9 +63,9 @@
         access: Allow
         priority: 101
         direction: Inbound
-      - name: Tomcat
+      - name: RDS
         protocol: Tcp
-        destination_port_range: 8080
+        destination_port_range: 3389
         access: Allow
         priority: 102
         direction: Inbound
